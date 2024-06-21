@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/Users')
 const Meter = require('../models/meters')
+const waziCloudService = require('../services/waziCloudService');
 
 // Manager signup
 
@@ -68,11 +69,16 @@ const getAllMeters = async (req,res)=>{
     if(!meters){
         return res.status(404).json({message:'no meters found'})
     }
-    return res.status(200).json({meters});
+    const metersInfo = await Promise.all(meters.map(meter => waziCloudService.getDeviceStatus(meter._id)));
+    const response = meters.map((meter, index) => ({
+        ...meter.toObject(),
+        status: metersInfo[index]
+      }));
+    return res.status(200).json({response});
 }
 
 
-// Get meter details by room number
+// Get meter details by id
 const getMeterDetails = async (req,res)=>{
     const id =  req.params.id
     try{
@@ -80,7 +86,8 @@ const getMeterDetails = async (req,res)=>{
         if(!meter){
             return res.status(404).json({message:'meter not found'})
         }
-        return res.status(200).json({meter})
+        const meterInfo = await waziCloudService.getDeviceDetails(meter._id);
+        return res.status(200).json({meterInfo})
     }catch(err){
         console.log(err)
         return res.status(500).json({message:'unable to get meter details'})
@@ -96,7 +103,9 @@ const toggleMeterStatus = async(req,res)=>{
         if(!meter){
             return res.status(404).json({message:'meter not found'})
         }   
-        meter.status = !meter.status;
+        const newStatus = !meter.status;
+        await waziCloudService.setDeviceStatus(meter._id, newStatus);
+        meter.status = newStatus;
         await meter.save();
         return res.status(200).json({message:'meter status changed successfully'});
     }catch(err){

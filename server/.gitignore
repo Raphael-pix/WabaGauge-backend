@@ -1,0 +1,32 @@
+# Dependency directories
+/node_modules
+
+# Environment variables file
+.env
+
+# Log files
+*.log
+
+# OS or Editor specific files
+.DS_Store
+Thumbs.db
+
+# Output of npm
+npm-debug.log
+yarn-debug.log*
+yarn-error.log*
+.pnp.*
+.pnp.js
+
+# Visual Studio Code directories/files
+.vscode/
+
+# IDE-specific files
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Compiled binary addons (some npm packages bundle these)
+/build/Release
