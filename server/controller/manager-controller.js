@@ -6,8 +6,6 @@ const Meter = require('../models/meters')
 const waziCloudService = require('../services/waziCloudService');
 
 
-
-
 // Get all meters
 const getAllMeters = async (req,res)=>{
     let meters
