@@ -7,7 +7,7 @@ const waziCloudService = require('../services/waziCloudService')
 
 // User signup
 const signup = async(req,res)=>{
-    const { email, room_no,password,role,confirmPassword } = req.body;
+    const { email,room_no,password,role,confirmPassword } = req.body;
 
     if(!isValidEmail(email)){
         return res.status(404).json({message:'email is not valid.Please try again'})
@@ -18,6 +18,7 @@ const signup = async(req,res)=>{
     if(!isValidPassword(password)){
         return res.status(404).json({message:'password is not valid'})
     }
+
     try {
          // Check if the user already exists
          let user = await User.findOne({ email:email });
@@ -37,10 +38,8 @@ const signup = async(req,res)=>{
         await newUser.save();
 
         //create waziup device
-        if (role !== 'manager') {
-            const deviceId = `device_${newUser._id}`;
-            await waziCloudService.createDevice(deviceId);
-        }
+        const deviceId = `device_${newUser._id}`;
+        await waziCloudService.createDevice(deviceId);
 
         //create  JWT token
         const payload = { id: newUser._id, role: newUser.role };
