@@ -83,4 +83,4 @@ const lockMeter = async(req,res)=>{
 }
 
 
-module.exports = {signup,login,getAllMeters,getMeterDetails,toggleMeterStatus,lockMeter}
+module.exports = {getAllMeters,getMeterDetails,toggleMeterStatus,lockMeter}

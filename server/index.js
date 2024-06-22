@@ -13,7 +13,6 @@ app.use(cors())
 app.use('/api/user',userRouter)
 app.use('/api/manager',managerRouter)
 
-
 app.use('/',(req,res)=>{
     res.send('Hello world')
 })
