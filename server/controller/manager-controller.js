@@ -5,56 +5,6 @@ const User = require('../models/Users')
 const Meter = require('../models/meters')
 const waziCloudService = require('../services/waziCloudService');
 
-// Manager signup
-
-const signup = async (req,res)=>{
-    const { email, password } = req.body;
-
-    if(!isValidEmail(email)){
-        return res.status(404).json({message:'email is not valid.Please try again'})
-    }
-    if(password !== confirmPassword){
-        return res.status(404).json({message:'passwords do not match'})
-    }
-    if(!isValidPassword(password)){
-        return res.status(404).json({message:passwordReq})
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newManager = new User({ 
-        email, 
-        password: hashedPassword, 
-        role: 'manager' 
-    });
-    try {
-        await newManager.save();
-        res.status(201).send('Manager created');
-    } catch (err) {
-        res.status(400).json({message:'unable to create user'});
-    }finally{
-        return res.status(200).json({newManager})
-    }
-}
-
-// Manager login
-
-const login = async(req,res)=>{
-    const { email, password } = req.body;
-
-    const manager = await User.findOne({ email });
-
-    if (!manager) {
-        return res.status(400).json({message:'Manager not found'});
-    }
-    try{
-        const isMatch = await bcrypt.compare(password, manager.password);
-        if (!isMatch) return res.status(400).send('Invalid credentials');
-        const token = jwt.sign({ id: manager._id, role: manager.role }, 'SECRET_KEY');
-        return res.status(200).send({ token });
-    }catch(err){
-        return res.status(404).json({message:'user not found'})
-    }
-}
 
 
 
@@ -69,7 +19,7 @@ const getAllMeters = async (req,res)=>{
     if(!meters){
         return res.status(404).json({message:'no meters found'})
     }
-    const metersInfo = await Promise.all(meters.map(meter => waziCloudService.getDeviceStatus(meter._id)));
+    const metersInfo = await Promise.all(meters.map(meter => waziCloudService.getDeviceDetails(meter._id)));
     const response = meters.map((meter, index) => ({
         ...meter.toObject(),
         status: metersInfo[index]

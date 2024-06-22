@@ -12,7 +12,7 @@ async function authenticate() {
       username: WAZIUP_USERNAME,
       password: WAZIUP_PASSWORD
     });
-    authToken = response.data.token;
+    authToken = response;
   } catch (error) {
     console.error('Error authenticating with Waziup:', error);
     throw new Error('Authentication failed');
@@ -27,7 +27,26 @@ async function getAuthToken() {
   return authToken;
 }
 
-// Function to get device status
+// Function to create device
+async function createDevice(deviceId) {
+  const token = await getAuthToken();
+  try{
+  const response = await axios.post(`${WAZIUP_API_BASE_URL}/devices`, {
+    id: deviceId
+  }, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'accept': 'application/json'
+    }
+  });
+  return response.data;
+  } catch (error) {
+    console.error('Error getting device status from Waziup:', error);
+    throw new Error('Failed to get device status');
+  }
+}
+// Function to get device details
 async function getDeviceDetails(deviceId) {
   const token = await getAuthToken();
   try {
@@ -63,5 +82,6 @@ async function setDeviceStatus(deviceId, status) {
 
 module.exports = {
   getDeviceDetails,
-  setDeviceStatus
+  setDeviceStatus,
+  createDevice
 };
